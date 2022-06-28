@@ -4,36 +4,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HUD : MonoBehaviour {
-    [Header("Game Session Info")]
-    [SerializeField] private GameSession _gameSession = null;
-    [SerializeField] private Text _scoreValue = null;
-    [SerializeField] private GameObject _timeRemaining = null;
-    [SerializeField] private Text _timeRemainingValue = null;
-    [Header("Game Over")]
-    [SerializeField] private GameObject _gameOverScreen = null;
-    
-    // Start is called before the first frame update
-    void Start()
+namespace PumpkinShooter.UI
+{
+    public class HUD : UIBase
     {
-        _gameSession.OnSessionEnd += HandleSessionEnded;
-    }
+        [Header("Game Session Info")]
+        [SerializeField] private Text _scoreValue = null;
+        [SerializeField] private GameObject _timeRemaining = null;
+        [SerializeField] private Text _timeRemainingValue = null;
+        [Header("Game Over")]
+        [SerializeField] private GameObject _gameOverScreen = null;
+        [Header("Loading")]
+        [SerializeField] private GameObject _loadingScreen = null;
 
-    string GetFormattedTimeFromSeconds( float seconds )
-    {
-        return Mathf.FloorToInt( seconds / 60.0f ).ToString("0") + ":" + Mathf.FloorToInt( seconds % 60.0f ).ToString("00");
-    }
+        string GetFormattedTimeFromSeconds(float seconds)
+        {
+            return Mathf.FloorToInt(seconds / 60.0f).ToString("0") + ":" + Mathf.FloorToInt(seconds % 60.0f).ToString("00");
+        }
 
-    void HandleSessionEnded()
-    {
-        _gameSession.OnSessionEnd -= HandleSessionEnded;
-        _timeRemaining.SetActive(false);
-        _gameOverScreen.SetActive(true);
-    }
+        public void HandleSessionEnded()
+        {
+            _timeRemaining.SetActive(false);
+            _gameOverScreen.SetActive(true);
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        _timeRemainingValue.text = GetFormattedTimeFromSeconds(_gameSession.timeLeft);
+        public void SetTime(float timeLeft)
+        {
+            _timeRemainingValue.text = GetFormattedTimeFromSeconds(timeLeft);
+        }
+
+        public void SetScore(int score)
+        {
+            _scoreValue.text = score.ToString();
+        }
+
+        public override void InitUI()
+        {
+            _loadingScreen.SetActive(false);
+            _gameOverScreen.SetActive(false);
+        }
+
+        public void ReloadGame()
+        {
+            _loadingScreen.SetActive(true);
+            GameManager.Instance.GoToGame();
+        }
+
+        public void BackToMenu()
+        {
+            _loadingScreen.SetActive(true);
+            GameManager.Instance.GoToMainMenu();
+        }
     }
 }

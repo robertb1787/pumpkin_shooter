@@ -1,60 +1,77 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class GameSession : MonoBehaviour
+namespace PumpkinShooter.Game
 {
-    public System.Action OnSessionStart;
-    public System.Action OnSessionEnd;
-
-    public float timeLeft = 0;
-
-    public enum SessionState
+    public class GameSession : MonoBehaviour
     {
-        Paused,
-        Active,
-        Finished
-    }
+        public UnityEvent OnSessionStart;
+        public UnityEvent OnSessionEnd;
+        public UnityEvent<int> OnAddedScore;
+        public UnityEvent<float> OnTimeChanged;
 
-    private SessionState _state = SessionState.Paused;
+        float timeLeft;
+        public int playerScore = 0;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        StartSession();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if( _state == SessionState.Active )
+        public enum SessionState
         {
-            timeLeft -= Time.deltaTime;
-            
-            if( timeLeft <= 0 )
+            Paused,
+            Active,
+            Finished
+        }
+
+        private SessionState _state = SessionState.Paused;
+
+        void Start()
+        {
+            StartSession();
+        }
+
+        private void OnEnable()
+        {
+            GameManager.CUSTOMUPDATE.AddListener(CustomUpdate);
+        }
+
+        private void OnDisable()
+        {
+            GameManager.CUSTOMUPDATE.RemoveListener(CustomUpdate);
+        }
+
+        void CustomUpdate(float deltaTime)
+        {
+            if (_state == SessionState.Active)
             {
-                timeLeft = 0;
-                EndSession();
+                timeLeft -= deltaTime;
+                OnTimeChanged.Invoke(timeLeft);
+                if (timeLeft <= 0)
+                {
+                    timeLeft = 0;
+                    EndSession();
+                }
             }
         }
-    }
 
-
-    void StartSession()
-    {
-        _state = SessionState.Active;
-
-        if( OnSessionStart != null )
+        public void AddedScore(int scoreToAdd)
         {
-            OnSessionStart();
+            playerScore += scoreToAdd;
+            OnAddedScore.Invoke(playerScore);
         }
-    }
 
-    void EndSession()
-    {
-        if( OnSessionEnd != null )
+        void StartSession()
         {
-            OnSessionEnd();
+            timeLeft = GameManager.Instance.gameData.sessionTime;
+            AddedScore(0);
+            _state = SessionState.Active;
+            OnSessionStart.Invoke();
+        }
+
+        void EndSession()
+        {
+            OnSessionEnd.Invoke();
+
+            GameManager.Instance.SetScore(playerScore);
         }
     }
 }

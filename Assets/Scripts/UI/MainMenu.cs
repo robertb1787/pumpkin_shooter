@@ -1,20 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour
+namespace PumpkinShooter.UI
 {
-    [SerializeField] private Text _highScore = null;
-    // Start is called before the first frame update
-    void Start()
-    {
-        _highScore.text = PlayerPrefs.HasKey("highScore") ? PlayerPrefs.GetInt("highScore").ToString() : 0.ToString();
-    }
 
-    // Update is called once per frame
-    void Update()
+    public class MainMenu : UIBase
     {
-        
+        [SerializeField] GameObject LoadingPanel;
+        [SerializeField] private Text _highScore = null;
+        [SerializeField] private Text _version = null;
+        [SerializeField] private Text _title = null;
+
+        public void LoadGame()
+        {
+            GameManager.Instance.GoToGame();
+            LoadingPanel.SetActive(true);
+        }
+
+        public override void InitUI()
+        {
+            _highScore.text = GameManager.Instance.userData.HighScore.ToString();
+            _version.text = GameManager.Instance.gameData.version;
+            _title.text = GameManager.Instance.gameData.title;
+            LoadingPanel.SetActive(false);
+        }
     }
 }
