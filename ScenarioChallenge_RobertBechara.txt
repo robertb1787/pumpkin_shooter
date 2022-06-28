@@ -1,0 +1,53 @@
+Scenario 2: 
+
+The first step I would do is to understand on which platform it would be publish, because each platform has its own limitation, and its own way to optimize. After understanding the platform which is needed, I would play the game myself and keep track of every time the game freezes or when it has few frames, one way is to record the section or write them on a note book. After acquiring the scenarios and the state of the game, I try to reproduce it in the editor to be able to use Unity’s build-in tools to help me debug the problem. After successfully reproducing the scenario, the first thing I would use the profiler to understand what it’s causing it. Mainly two things you need to worry about which is the visuals or the code, and the good thing the profiler can show you everything from CPU, GPU or RAM consumption. If you see that the bottle neck is from the CPU therefor it is from the code, if the GPU then from the 3D models/VFX/Materials/post processing/Lights/Shadows, else if it is from the RAM then you got problem with the Audio/Texture/Video/Animation/FBXs. Next step if it was from the code, I continue with the profiler yet in the deep profiler, if it was from the GPU focus on the GPU profiler, if from the RAMs I jump to the editor logs since it is a size problem. After deducing the origin of the problem then I would start turning on and off Gameobjet in the scene to directly pin point the problem and write them down.  
+
+There are multiple solutions of these problems which are the following: 
+
+Pooling the object that are being spawned and despawned frequently, like the bullets, enemies, UI text (score, damage, coins...) VFX, ragdolls etc... 
+
+Suggest using multiple canvases for the UI and making the hierarchy less depth to it.  
+
+Use atlases for the sprites and UI. 
+
+Lower the number of particles in a particle system. 
+
+Use LODs(Level of details) for the object 
+
+Bake lights on the static environment. 
+
+Disable the shadows on object that are the ground which they will not cast any shadow 
+
+Disable the shadows on the moving characters and create a circle sprite that simulate the shadows (give the illusion of a shadow) 
+
+Combine meshes and materials to lower the number of batches and draw calls. 
+
+Avoid transparency materials, and overlapping transparency material, if not needed. 
+
+Avoid multiple materials on the same 3d Object. 
+
+Avoid using the Update function at all cost the less the better, use events instead. 
+
+One manager that calls all the update functions once per frame (this is a custom pattern), where every gameobject that needs an update function hooks to the manager and then the manager would call the updated. 
+
+If a collection is used if it is static and does not change use an array, if it frequently changes use a list. And do not be afraid to use a dictionary it is the most efficient collection to get a value from. 
+
+Use layers to optimize the physics to avoid useless collisions and test. 
+
+Use square magnitude rather than magnitude since magnitude uses a radical functionality which is heavy on the CPU. 
+
+Lower the resolution of the game (usually I use a dynamic way based of the FPS history on the device) 
+
+Set multiple quality settings that would be set automatically when you open your device based on a test. 
+
+In the player settings add the heavy assets in the preloaded assets to avoid spikes  
+
+The only way to confirm that it had a positive impact if the game looks the same or relatively like the previous build and has higher FPS. In this stage you are in polishing stage thus means the most important thing is to test the game. 
+
+Scenario 3: 
+
+The first thing that I do is open the editor log file since after a build unity dump all the file size in last build that was created. Here I would understand if it is from the new models or texture or audio. 
+
+Before informing the team, I would try to fix the problem myself since some problems could be fix with troubling other deportment. After trying two to three attempts, if I found the solution I would go to the specific department and try to understand how they did the specific file and tell them my solution and try to create a flow that would work for the both of us. 
+
+One step to reduce is to create an atlas, another is to reduce the size of the texture, or change the compression type. Or maybe turn off Mip Maps. 
